@@ -83,6 +83,7 @@ const int trianglesPerSquare = 2; // Two triangles per square to form a 1x1 chun
 const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare; // Amount of triangles on map
 
 GLuint terrainVAO, terrainVBO, terrainEBO; // Terrain VAO, VBO and EBO
+GLuint waterVAO, waterVBO, waterEBO; // Terrain VAO, VBO and EBO
 
 int main()
 {
@@ -116,6 +117,7 @@ int main()
 
     //Loading of shaders
     Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag");
+    Shader WaterShaders("shaders/waterVertexShader.vert", "shaders/waterFragmentShader.frag");
     Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragmentShader.frag");
     Model Rock("media/rock/Rock07-Base.obj");
     Model Tree("media/tree/palm.obj");
@@ -280,6 +282,101 @@ int main()
     //Depth Testing
     glEnable(GL_DEPTH_TEST);
 
+    //Water plane vertices (flat horizontal plane)
+    float waterVertices[] = {
+        //Positions                     //Colours (Blue)        //Texture
+        1.0f, -3.0f, 1.0f,              0.0f, 0.5f, 1.0f,       1.0f, 1.0f,//top right
+        1.0f, -3.0f, -6.9375f,          0.0f, 0.0f, 1.0f,       1.0f, 0.0f, //bottom right
+        -6.9375f, -3.0f, -6.9375f,      0.0f, 0.5f, 1.0f,       0.0f, 0.0f,//bottom left
+        -6.9375f, -3.0f, 1.0f,          0.0f, 0.0f, 1.0f,       0.0f, 1.0f//top left
+    };
+
+    unsigned int waterIndices[] = {
+        0, 1, 3, //first triangle
+        1, 2, 3 //second triangle
+    };
+
+    //Sets index of water VAO
+    glGenVertexArrays(1, &waterVAO);
+    //Sets indexes of water buffer objects
+    glGenBuffers(1, &waterVBO);
+    glGenBuffers(1, &waterEBO);
+
+    //Binds water VAO to a buffer
+    glBindVertexArray(waterVAO);
+
+    //Binds water vertex object to array buffer
+    glBindBuffer(GL_ARRAY_BUFFER, waterVBO);
+    //Allocates buffer memory for the vertices of the water buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(waterVertices), waterVertices, GL_STATIC_DRAW);
+
+    //Binding & allocation for water indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, waterEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(waterIndices), waterIndices, GL_STATIC_DRAW);
+
+    //Allocation & indexing of vertex attribute memory for water vertex shader
+    //Positions
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    //Colours
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    //Texture
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    //Unbinding
+    glBindVertexArray(0);
+
+    unsigned int texture1, texture2;
+
+    // (1st) Water Texture
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("media/textures/seamlesswater.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        std::cout << "Successfully loaded texture" << std::endl;
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    // (2nd) Water Texture
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    // set the texture wrapping/filtering options (on the currently bound texture object)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+    data = stbi_load("media/textures/signature.png", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        std::cout << "Successfully loaded texture" << std::endl;
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
     //Sets the framebuffer_size_callback() function as the callback for the window resizing event
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -316,6 +413,30 @@ int main()
 
         glBindVertexArray(terrainVAO);
         glDrawElements(GL_TRIANGLES, MAP_SIZE * 32, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
+
+        //Draw Water
+        WaterShaders.use();
+        glUniform1i(glGetUniformLocation(WaterShaders.ID, "texture1"), 0);
+        WaterShaders.setInt("texture2", 1);
+
+        mat4 waterModel = mat4(1.0f);
+        waterModel = scale(waterModel, vec3(2.0f, 2.0f, 2.0f));
+        waterModel = rotate(waterModel, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
+        waterModel = translate(waterModel, vec3(0.0f, -2.f, -1.5f));
+
+        mat4 waterMVP = projection * view * waterModel;
+        WaterShaders.setMat4("mvpIn", waterMVP);
+
+        // bind textures on corresponding texture units
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+
+        glBindVertexArray(waterVAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         //Switch back to model shader
@@ -424,7 +545,7 @@ void ProcessUserInput(GLFWwindow* WindowIn)
     }
 
     //Extent to which to move in one instance
-    const float movementSpeed = 1.0f * deltaTime;
+    const float movementSpeed = 5.0f * deltaTime;
     //WASD controls
     if (glfwGetKey(WindowIn, GLFW_KEY_W) == GLFW_PRESS)
     {
