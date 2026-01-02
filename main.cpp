@@ -157,13 +157,18 @@ int main()
             // Retrieval of biome to set
             float biomeValue = BiomeNoise.GetNoise((float)x, (float)y);
 
-            if (biomeValue <= -0.75f) // Plains
+            if (biomeValue <= -0.75f) // White
             {
                 terrainVertices[i][3] = 1.0f;
                 terrainVertices[i][4] = 1.0f;
                 terrainVertices[i][5] = 1.0f;
             }
-            else { // Desert
+            else if (biomeValue <= -0.50f){
+                terrainVertices[i][3] = 0.9f;
+                terrainVertices[i][4] = 0.9f;
+                terrainVertices[i][5] = 0.9f;
+            }
+            else { // Grey
                 terrainVertices[i][3] = 0.8f;
                 terrainVertices[i][4] = 0.8f;
                 terrainVertices[i][5] = 0.8f;
