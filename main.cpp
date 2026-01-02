@@ -92,7 +92,7 @@ int main()
     //Initialisation of 'GLFWwindow' object
     windowWidth = 1280;
     windowHeight = 720;
-    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Lab5", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "CW2", NULL, NULL);
 
     //Checks if window has been successfully instantiated
     if (window == NULL)
@@ -163,7 +163,7 @@ int main()
                 terrainVertices[i][4] = 1.0f;
                 terrainVertices[i][5] = 1.0f;
             }
-            else if (biomeValue <= -0.50f){
+            else if (biomeValue <= -0.50f){ // Slightly less white
                 terrainVertices[i][3] = 0.9f;
                 terrainVertices[i][4] = 0.9f;
                 terrainVertices[i][5] = 0.9f;
