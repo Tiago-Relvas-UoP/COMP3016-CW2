@@ -119,8 +119,8 @@ int main()
     Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag");
     Shader WaterShaders("shaders/waterVertexShader.vert", "shaders/waterFragmentShader.frag");
     Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragmentShader.frag");
-    Model Rock("media/rock/Rock07-Base.obj");
-    Model Tree("media/tree/palm.obj");
+    Model Ufo("media/ufo/UFO_obj/UFO.obj"); // Ufo
+    Model Plane("media/plane/floatplane/floatplane.obj"); // Plane
     Shaders.use();
 
     // Assigning perlin noise type for map
@@ -284,16 +284,53 @@ int main()
 
     //Water plane vertices (flat horizontal plane)
     float waterVertices[] = {
+        // Front face
         //Positions                     //Colours (Blue)        //Texture
-        1.0f, -3.0f, 1.0f,              0.0f, 0.5f, 1.0f,       1.0f, 1.0f,//top right
-        1.0f, -3.0f, -6.9375f,          0.0f, 0.0f, 1.0f,       1.0f, 0.0f, //bottom right
-        -6.9375f, -3.0f, -6.9375f,      0.0f, 0.5f, 1.0f,       0.0f, 0.0f,//bottom left
-        -6.9375f, -3.0f, 1.0f,          0.0f, 0.0f, 1.0f,       0.0f, 1.0f//top left
+        1.0f, -3.0f, 1.0f,              0.0f, 0.5f, 1.0f,       1.0f, 1.0f,  // 0: top right front
+        1.0f, -3.5f, 1.0f,              0.0f, 0.4f, 0.9f,       1.0f, 0.0f,  // 1: bottom right front
+        -6.9375f, -3.5f, 1.0f,          0.0f, 0.4f, 0.9f,       0.0f, 0.0f,  // 2: bottom left front
+        -6.9375f, -3.0f, 1.0f,          0.0f, 0.5f, 1.0f,       0.0f, 1.0f,  // 3: top left front
+
+        // Back face      
+        //Positions                     //Colours (Blue)        //Texture
+        1.0f, -3.0f, -6.9375f,          0.0f, 0.5f, 1.0f,       1.0f, 1.0f,  // 4: top right back
+        1.0f, -3.5f, -6.9375f,          0.0f, 0.4f, 0.9f,       1.0f, 0.0f,  // 5: bottom right back
+        -6.9375f, -3.5f, -6.9375f,      0.0f, 0.4f, 0.9f,       0.0f, 0.0f,  // 6: bottom left back
+        -6.9375f, -3.0f, -6.9375f,      0.0f, 0.5f, 1.0f,       0.0f, 1.0f,   // 7: top left back
+
+        // Top face 
+        //Positions                     //Colours (Blue)        //Texture
+        1.0f, -3.0f, 1.0f,              0.0f, 0.5f, 1.0f,       1.0f, 0.0f,  // 8: top right front
+        -6.9375f, -3.0f, 1.0f,          0.0f, 0.5f, 1.0f,       0.0f, 0.0f,  // 9: top left front
+        1.0f, -3.0f, -6.9375f,          0.0f, 0.5f, 1.0f,       1.0f, 1.0f,  // 10: top right back
+        -6.9375f, -3.0f, -6.9375f,      0.0f, 0.5f, 1.0f,       0.0f, 1.0f,  // 11: top left back
+
+        // Bottom face         //Colours (Blue)        //Texture
+        1.0f, -3.5f, 1.0f,              0.0f, 0.4f, 0.9f,       1.0f, 0.0f,  // 12:bottom right front
+        -6.9375f, -3.5f, 1.0f,          0.0f, 0.4f, 0.9f,       0.0f, 0.0f,  // 13: bottom left front
+        1.0f, -3.5f, -6.9375f,          0.0f, 0.4f, 0.9f,       1.0f, 1.0f,  // 14: bottom right back
+        -6.9375f, -3.5f, -6.9375f,      0.0f, 0.4f, 0.9f,       0.0f, 1.0f   // 15: bottom left back
     };
 
     unsigned int waterIndices[] = {
-        0, 1, 3, //first triangle
-        1, 2, 3 //second triangle
+        // Front face
+        0, 1, 3,
+        1, 2, 3,
+        // Back face
+        4, 7, 5,
+        5, 7, 6,
+        // Top face 
+        8, 9, 10,
+        9, 11, 10,
+        // Bottom face
+        12, 14, 13,
+        13, 14, 15,
+        // Left face
+        3, 2, 7,
+        2, 6, 7,
+        // Right face
+        0, 4, 1,
+        1, 4, 5
     };
 
     //Sets index of water VAO
@@ -436,16 +473,19 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture2);
 
         glBindVertexArray(waterVAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         //Switch back to model shader
         Shaders.use();
 
+        //Ufo
         model = mat4(1.0f); //Model matrix
-        model = scale(model, vec3(0.025f, 0.025f, 0.025f)); //rock //Scaling to zoom in
-        model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); //Looking straight forward
-        model = translate(model, vec3(0.0f, -2.f, -1.5f)); //Elevation to look upon terrain
+        model = translate(model, vec3(-9.0f, -2.f, -9.f)); //Elevation to look upon terrain
+        model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 1.0f, 0.0f)); //Looking straight forward
+        model = scale(model, vec3(0.5f, 0.5f, 0.5f)); //Ufo //Scaling to zoom in
+        // model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 1.0f, 0.0f)); //Looking straight forward
+        //model = translate(model, vec3(-6.0f, -1.5f, -7.5f)); //Elevation to look upon terrain
 
         //Projection matrix
         projection = perspective(radians(45.0f), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
@@ -454,23 +494,25 @@ int main()
         //Viewer orientation
         view = lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp); //Sets the position of the viewer, the movement direction in relation to it & the world up direction
 
-        //Rock
+        //Ufo
         SetMatrices(Shaders);
-        Rock.Draw(Shaders);
+        Ufo.Draw(Shaders);
 
-        //Tree (changes MVP in relation to past values)
+        //Plane (changes MVP in relation to past values)
         model = mat4(1.0f); //Model matrix
-        model = scale(model, vec3(0.20f, 0.20f, 0.20f)); //rock //Scaling to zoom in
+        model = translate(model, vec3(-3.5f, -2.f, -9.f)); //Elevation to look upon terrain
         model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); //Looking straight forward
-        model = translate(model, vec3(0.0f, -2.f, -1.5f)); //Elevation to look upon terrain
+        model = scale(model, vec3(0.025f, 0.025f, 0.025f)); //Plane //Scaling to zoom in
+        //model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); //Looking straight forward
+        //model = translate(model, vec3(-3.5f, -2.f, -7.5f)); //Elevation to look upon terrain
 
         //Projection matrix
         projection = perspective(radians(45.0f), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
 
         SetMatrices(Shaders);
-        Tree.Draw(Shaders);
+        Plane.Draw(Shaders);
 
-        //Rock (reorient MVP back to starting values)
+        //Ufo (reorient MVP back to starting values)
         model = scale(model, vec3(20.0f, 20.0f, 20.0f));
         SetMatrices(Shaders);
 
