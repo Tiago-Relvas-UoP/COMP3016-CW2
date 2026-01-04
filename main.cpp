@@ -30,7 +30,7 @@
 using namespace std;
 using namespace glm;
 
-//Window
+//Window dimensions
 int windowWidth;
 int windowHeight;
 
@@ -68,13 +68,13 @@ mat4 model;
 mat4 view;
 mat4 projection;
 
-//Time
+//TIME VARIABLES
 //Time change
 float deltaTime = 0.0f;
 //Last value of time change
 float lastFrame = 0.0f;
 
-// Terrain/Clouds
+// Procedurally-generated Terrain (clouds) config
 #define RENDER_DISTANCE 128 //Render width of map
 #define MAP_SIZE RENDER_DISTANCE * RENDER_DISTANCE // Size of map in x & z space
 
@@ -82,10 +82,12 @@ const int squaresRow = RENDER_DISTANCE - 1; // Amount of chunks across one dimen
 const int trianglesPerSquare = 2; // Two triangles per square to form a 1x1 chunk
 const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare; // Amount of triangles on map
 
+// Buffer Objects for Terrain (Clouds), Water and Sun/Light Objects
 GLuint terrainVAO, terrainVBO, terrainEBO; // Terrain VAO, VBO and EBO
-GLuint waterVAO, waterVBO, waterEBO; // Terrain VAO, VBO and EBO
-GLuint sunVAO, sunVBO, lightVAO;
+GLuint waterVAO, waterVBO, waterEBO; // Water VAO, VBO and EBO
+GLuint sunVAO, sunVBO, lightVAO; // sun VAO, VBO & light VAO
 
+// Main
 int main()
 {
     //Initialisation of GLFW
@@ -116,16 +118,20 @@ int main()
         return -1;
     }
 
-    //Loading of shaders
-    Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag");
-    Shader WaterShaders("shaders/waterVertexShader.vert", "shaders/waterFragmentShader.frag");
-    Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragmentShader.frag");
-    Shader LightShader("shaders/LightVertexShader.vert", "shaders/LightFragmentShader.frag");
+    //Shaders Loading  
+    Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag"); // Main Shader (For models)
+    Shader WaterShaders("shaders/waterVertexShader.vert", "shaders/waterFragmentShader.frag"); // Water Shader
+    Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragmentShader.frag"); // Terrain (Clouds) Shader
+    Shader LightShader("shaders/LightVertexShader.vert", "shaders/LightFragmentShader.frag"); // Light Shader
+    
+    // 3D Model Loading
     Model Ufo("media/ufo2/model/Low_poly_UFO.FBX"); // Ufo FBX
-    // C:\Users\drtie\Documents\!Uni\COMP3016\COMP3016 - CW2\media\ufo_FBX
-    // Model Ufo("media/ufo/UFO_obj/UFO.obj"); // Ufo
     Model Plane("media/plane/floatplane/floatplane.obj"); // Plane
+
+    // Activates main shader
     Shaders.use();
+
+    // !! CODE SEGMENT FOR TERRAIN (CLOUDS) GENERATION !! 
 
     // Assigning perlin noise type for map
     FastNoiseLite TerrainNoise;
@@ -151,6 +157,7 @@ int main()
     // Terrain vertice index
     int i = 0;
 
+    // Generate height and color data for each vertex
     for (int y = 0; y < RENDER_DISTANCE; y++)
     {
         for (int x = 0; x < RENDER_DISTANCE; x++)
@@ -161,21 +168,21 @@ int main()
             // Retrieval of biome to set
             float biomeValue = BiomeNoise.GetNoise((float)x, (float)y);
 
-            if (biomeValue <= -0.75f) // White
+            if (biomeValue <= -0.75f) // White Color
             {
                 terrainVertices[i][3] = 1.0f;
                 terrainVertices[i][4] = 1.0f;
                 terrainVertices[i][5] = 1.0f;
             }
-            else if (biomeValue <= -0.50f){ // Slightly less white
-                terrainVertices[i][3] = 0.9f;
-                terrainVertices[i][4] = 0.9f;
-                terrainVertices[i][5] = 0.9f;
-            }
-            else { // Grey
+            else if (biomeValue <= -0.50f){ // Grey Color
                 terrainVertices[i][3] = 0.8f;
                 terrainVertices[i][4] = 0.8f;
                 terrainVertices[i][5] = 0.8f;
+            }
+            else { // Dark Grey Color
+                terrainVertices[i][3] = 0.6f;
+                terrainVertices[i][4] = 0.6f;
+                terrainVertices[i][5] = 0.6f;
             }
 
             i++;
@@ -252,6 +259,10 @@ int main()
         }
     }
 
+    // !! END CODE SEGMENT FOR TERRAIN (CLOUDS) GENERATION !! 
+    
+    // !! TERRAIN (CLOUDS) BUFFER SETUP !! 
+
     //Sets index of VAO
     glGenVertexArrays(1, &terrainVAO);//TerrainVAO
 
@@ -285,13 +296,11 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    //Sets the viewport size within the window to match the window size of 1280x720
-    glViewport(0, 0, 1280, 720);
+    // !! END OF TERRAIN (CLOUDS) BUFFER SETUP !! 
 
-    //Depth Testing
-    glEnable(GL_DEPTH_TEST);
+    // !! WATER VERTEX, INDICES AND BUFFER SETUP !! 
 
-    //Water plane vertices (flat horizontal plane)
+    //Water vertices (Squashed down Cube)
     float waterVertices[] = {
         // Front face
         //Positions                     //Colours (Blue)        //Texture
@@ -321,6 +330,7 @@ int main()
         -6.9375f, -3.5f, -6.9375f,      0.0f, 0.4f, 0.9f,       0.0f, 1.0f   // 15: bottom left back
     };
 
+    // Water Indices
     unsigned int waterIndices[] = {
         // Front face
         0, 1, 3,
@@ -376,8 +386,12 @@ int main()
     //Unbinding
     glBindVertexArray(0);
 
-    // Sun/Light Cube
-    // Vertices for our Light Cube (Sun)
+    // !! END OF WATER VERTEX, INDICES AND BUFFER SETUP !! 
+
+
+    // !! SUN/LIGHT VERTEX, INDICES AND BUFFER SETUP !! 
+ 
+    //sun vertices (Cube)
     float sunVertices[] = {
         -0.5f, -0.5f, -0.5f,
          0.5f, -0.5f, -0.5f,
@@ -422,22 +436,34 @@ int main()
         -0.5f,  0.5f, -0.5f,
     };
 
+    //Sets index of sun VAO
     glGenVertexArrays(1, &sunVAO);
+
+    //Sets indexes of sun buffer object
     glGenBuffers(1, &sunVBO);
     
-    glBindBuffer(GL_ARRAY_BUFFER, sunVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(sunVertices), sunVertices, GL_STATIC_DRAW);
+    //Binds sun VAO to a buffer
     glBindVertexArray(sunVAO);
+    //Binds sun vertex object to array buffer
+    glBindBuffer(GL_ARRAY_BUFFER, sunVBO);
+    //Allocates buffer memory for the vertices of the sun buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(sunVertices), sunVertices, GL_STATIC_DRAW);
 
+    // Allocation & indexing of vertex attribute memory for sun vertex shader
+    //Positions
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    //Sets index of light VAO
     glGenVertexArrays(1, &lightVAO);
+    //Binds light VAO to a buffer
     glBindVertexArray(lightVAO);
 
-    // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
+    //Binds sun vertex object to array buffer
     glBindBuffer(GL_ARRAY_BUFFER, sunVBO);
 
+    // Allocation & indexing of vertex attribute memory for light vertex shader
+    //Positions
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
@@ -446,9 +472,11 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+    // !! END OF SUN/LIGHT VERTEX, INDICES AND BUFFER SETUP !!
+
     unsigned int texture1, texture2;
 
-    // (1st) Water Texture
+    // WATER TEXTURE (1ST)
     glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
     // set the texture wrapping/filtering options (on the currently bound texture object)
@@ -471,7 +499,7 @@ int main()
     }
     stbi_image_free(data);
 
-    // (2nd) Water Texture
+    // SIGNATURE TEXTURE (2ND)
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
     // set the texture wrapping/filtering options (on the currently bound texture object)
@@ -499,105 +527,120 @@ int main()
     //Sets the mouse_callback() function as the callback for the mouse movement event
     glfwSetCursorPosCallback(window, mouse_callback);
 
+    //Sets the viewport size within the window to match the window size of 1280x720
+    glViewport(0, 0, 1280, 720);
+
+    //Depth Testing
+    glEnable(GL_DEPTH_TEST);
+
     //Render loop
     while (glfwWindowShouldClose(window) == false)
     {
-        //Time
+        // !! TIME !!
+        // Calculates delta time so movement is not dependant on frames
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        //Input
+        // !! INPUT PROCESSING !!
         ProcessUserInput(window); //Takes user input
 
-        //Rendering
+        // !! RENDERING !!
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); //Colour to display on cleared window // Blue: (0.25f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); //Clears the colour buffer
         glClear(GL_DEPTH_BUFFER_BIT); //Might need
 
         glDisable(GL_CULL_FACE); //Discards all back-facing triangles
 
-        // Light Position/Color
+        // !! LIGHT POSITION / COLOR !! 
         vec3 lightPosition = vec3(0.0f, 5.0f, 0.0f);
         vec3 lightCol = vec3(1.0f, 0.98f, 0.83f);
 
-        //Draw Terrain
+        // !! DRAW TERRAIN !!
         TerrainShaders.use();
         TerrainShaders.setVec3("lightColor", lightCol);
         TerrainShaders.setVec3("lightPos", lightPosition); 
         TerrainShaders.setVec3("viewPos", cameraPosition);
 
+        // Terrain (clouds) model matrix transformations
         mat4 terrainModel = mat4(1.0f);
         terrainModel = scale(terrainModel, vec3(2.0f, 2.0f, 2.0f));
         terrainModel = rotate(terrainModel, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
         terrainModel = translate(terrainModel, vec3(0.0f, -2.f, -1.5f));
 
+        // Calculates and sets MVP matrix for terrain (clouds)
         mat4 terrainMVP = projection * view * terrainModel;
         TerrainShaders.setMat4("mvpIn", terrainMVP);
         TerrainShaders.setMat4("model", terrainModel); 
 
+        // Draws terrain using indexed rendering
         glBindVertexArray(terrainVAO);
         glDrawElements(GL_TRIANGLES, MAP_SIZE * 32, GL_UNSIGNED_INT, 0);
-
         glBindVertexArray(0);
 
-        //Draw Water
+        // !! DRAW WATER !!
         WaterShaders.use();
         WaterShaders.setVec3("lightColor", lightCol);
         WaterShaders.setVec3("lightPos", lightPosition);
 
-
+        // Sets texture uniforms for water model (Water/Signature texture)
         glUniform1i(glGetUniformLocation(WaterShaders.ID, "texture1"), 0);
         WaterShaders.setInt("texture2", 1);
 
+        // Water model matrix transformations
         mat4 waterModel = mat4(1.0f);
         waterModel = scale(waterModel, vec3(2.0f, 2.0f, 2.0f));
         waterModel = rotate(waterModel, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
         waterModel = translate(waterModel, vec3(0.0f, -2.f, -1.5f));
 
+        // Calculates and sets MVP matrix for water
         mat4 waterMVP = projection * view * waterModel;
         WaterShaders.setMat4("mvpIn", waterMVP);
         WaterShaders.setMat4("model", waterModel); 
 
-        // bind textures on corresponding texture units
+        // Binds textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
+        // Draws water using indexed rendering
         glBindVertexArray(waterVAO);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
-        //Draw Light Cube
+        // !! DRAW SUN/LIGHT CUBE !!
         LightShader.use();
 
+        // Suns model matrix transformations
         mat4 lightModel = mat4(1.0f);
         lightModel = translate(lightModel, lightPosition);
         lightModel = scale(lightModel, vec3(0.2f));
 
+        // Calculates and sets MVP matrix for sun/light
         mat4 lightMVP = projection * view * lightModel;
         LightShader.setMat4("mvpIn", lightMVP);
 
+        // Draws sun/light cube using array rendering
         glBindVertexArray(lightVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
         glBindVertexArray(0);
 
+        // !! MODEL DRAWING !!
 
         //Switch back to model shader
         Shaders.use();
         Shaders.setVec3("lightColor", lightCol);
         Shaders.setVec3("lightPos", lightPosition);
 
-        //Ufo
+        // !! UFO MODEL !!
+
+        // Ufo model matrix transformations
         model = mat4(1.0f); //Model matrix
-        model = translate(model, vec3(-9.0f, -1.f, -9.f)); //Elevation to look upon terrain
-        model = rotate(model, radians(90.0f), vec3(-1.0f, 0.0f, 0.0f));
-        model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 0.0f, 1.0f)); //Looking straight forward
-        model = scale(model, vec3(0.07f, 0.07f, 0.07f)); //Ufo //Scaling to zoom in
-        // model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 1.0f, 0.0f)); //Looking straight forward
-        //model = translate(model, vec3(-6.0f, -1.5f, -7.5f)); //Elevation to look upon terrain
+        model = translate(model, vec3(-9.0f, -1.f, -9.f)); // World Position
+        model = rotate(model, radians(90.0f), vec3(-1.0f, 0.0f, 0.0f)); // Initial rotation
+        model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 0.0f, 1.0f)); // Continous rotation over time in the Z-Axis
+        model = scale(model, vec3(0.07f, 0.07f, 0.07f)); // Scaled down to appropriate size (1.0f is too large)
 
         //Projection matrix
         projection = perspective(radians(45.0f), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
@@ -606,33 +649,37 @@ int main()
         //Viewer orientation
         view = lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp); //Sets the position of the viewer, the movement direction in relation to it & the world up direction
 
-        //Ufo
+        // Draws UFO after setting matrices 
         SetMatrices(Shaders);
         Shaders.setMat4("model", model); 
         Ufo.Draw(Shaders);
 
-        //Plane (changes MVP in relation to past values)
+        // !! PLANE MODEL !! 
+        // (changes MVP in relation to past values)
+
+        // Plane model matrix transformations
         model = mat4(1.0f); //Model matrix
-        model = translate(model, vec3(-3.5f, -1.4f, -9.f)); //Elevation to look upon terrain
-        model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); //Looking straight forward
-        model = scale(model, vec3(0.025f, 0.025f, 0.025f)); //Plane //Scaling to zoom in
-        //model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); //Looking straight forward
-        //model = translate(model, vec3(-3.5f, -2.f, -7.5f)); //Elevation to look upon terrain
+        model = translate(model, vec3(-3.5f, -1.4f, -9.f)); // World Position
+        model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); // No aditional rotation. It's already good enough
+        model = scale(model, vec3(0.025f, 0.025f, 0.025f)); // Scaled down to appropriate size (1.0f is too large)
 
         //Projection matrix
         projection = perspective(radians(45.0f), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
 
+        // Draws Plane after setting matrices 
         SetMatrices(Shaders);
         Shaders.setMat4("model", model);
         Plane.Draw(Shaders);
 
-        //Ufo (reorient MVP back to starting values)
+        //Reorients MVP back to starting values for the next frame
         model = scale(model, vec3(20.0f, 20.0f, 20.0f));
         SetMatrices(Shaders);
 
+        // !! FRAME FINALIZATION !! 
+
         //Refreshing
         glfwSwapBuffers(window); //Swaps the colour buffer
-        glfwPollEvents(); //Queries all GLFW events
+        glfwPollEvents(); //Queries all GLFW events (Mouse, keyboard, etc.)
     }
 
     //Safely terminates GLFW
@@ -641,12 +688,14 @@ int main()
     return 0;
 }
 
+// Callback function that allows window resizing
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     //Resizes window based on contemporary width & height values
     glViewport(0, 0, width, height);
 }
 
+// Callback function that allows mouse movement in first person
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     //Initially no last positions, so sets last positions to current positions
@@ -692,6 +741,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     cameraFront = normalize(direction);
 }
 
+// Callback function that allows movement to be processed by keyboard
 void ProcessUserInput(GLFWwindow* WindowIn)
 {
     //Closes window on 'exit' key press
@@ -721,6 +771,7 @@ void ProcessUserInput(GLFWwindow* WindowIn)
     }
 }
 
+// Function that sets MVP matrices for Shader use
 void SetMatrices(Shader& ShaderProgramIn)
 {
     mat4 mvp = projection * view * model; //Setting of MVP
