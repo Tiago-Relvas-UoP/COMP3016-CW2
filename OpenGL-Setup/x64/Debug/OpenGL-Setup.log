@@ -1,3 +1,2 @@
 ﻿  main.cpp
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   OpenGL-Setup.vcxproj -> C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\x64\Debug\OpenGL-Setup.exe

@@ -84,6 +84,7 @@ const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare; // Amoun
 
 GLuint terrainVAO, terrainVBO, terrainEBO; // Terrain VAO, VBO and EBO
 GLuint waterVAO, waterVBO, waterEBO; // Terrain VAO, VBO and EBO
+GLuint sunVAO, sunVBO, lightVAO;
 
 int main()
 {
@@ -119,7 +120,10 @@ int main()
     Shader Shaders("shaders/vertexShader.vert", "shaders/fragmentShader.frag");
     Shader WaterShaders("shaders/waterVertexShader.vert", "shaders/waterFragmentShader.frag");
     Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragmentShader.frag");
-    Model Ufo("media/ufo/UFO_obj/UFO.obj"); // Ufo
+    Shader LightShader("shaders/LightVertexShader.vert", "shaders/LightFragmentShader.frag");
+    Model Ufo("media/ufo_FBX/Low_poly_UFO.FBX"); // Ufo FBX
+    // C:\Users\drtie\Documents\!Uni\COMP3016\COMP3016 - CW2\media\ufo_FBX
+    // Model Ufo("media/ufo/UFO_obj/UFO.obj"); // Ufo
     Model Plane("media/plane/floatplane/floatplane.obj"); // Plane
     Shaders.use();
 
@@ -372,6 +376,76 @@ int main()
     //Unbinding
     glBindVertexArray(0);
 
+    // Sun/Light Cube
+    // Vertices for our Light Cube (Sun)
+    float sunVertices[] = {
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+
+        -0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f, -0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+
+        -0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f, -0.5f,
+         0.5f, -0.5f,  0.5f,
+         0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f,  0.5f,
+        -0.5f, -0.5f, -0.5f,
+
+        -0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f, -0.5f,
+         0.5f,  0.5f,  0.5f,
+         0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f,  0.5f,
+        -0.5f,  0.5f, -0.5f,
+    };
+
+    glGenVertexArrays(1, &sunVAO);
+    glGenBuffers(1, &sunVBO);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, sunVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(sunVertices), sunVertices, GL_STATIC_DRAW);
+    glBindVertexArray(sunVAO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+
+    // we only need to bind to the VBO (to link it with glVertexAttribPointer), no need to fill it; the VBO's data already contains all we need (it's already bound, but we do it again for educational purposes)
+    glBindBuffer(GL_ARRAY_BUFFER, sunVBO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    //Unbinding
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
     unsigned int texture1, texture2;
 
     // (1st) Water Texture
@@ -437,14 +511,22 @@ int main()
         ProcessUserInput(window); //Takes user input
 
         //Rendering
-        glClearColor(0.25f, 0.0f, 1.0f, 1.0f); //Colour to display on cleared window
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f); //Colour to display on cleared window // Blue: (0.25f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); //Clears the colour buffer
         glClear(GL_DEPTH_BUFFER_BIT); //Might need
 
         glDisable(GL_CULL_FACE); //Discards all back-facing triangles
 
+        // Light Position/Color
+        vec3 lightPosition = vec3(0.0f, 5.0f, 0.0f);
+        vec3 lightCol = vec3(1.0f, 0.98f, 0.83f);
+
         //Draw Terrain
         TerrainShaders.use();
+        TerrainShaders.setVec3("lightColor", lightCol);
+        TerrainShaders.setVec3("lightPos", lightPosition); 
+        TerrainShaders.setVec3("viewPos", cameraPosition);
+
         mat4 terrainModel = mat4(1.0f);
         terrainModel = scale(terrainModel, vec3(2.0f, 2.0f, 2.0f));
         terrainModel = rotate(terrainModel, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
@@ -452,6 +534,7 @@ int main()
 
         mat4 terrainMVP = projection * view * terrainModel;
         TerrainShaders.setMat4("mvpIn", terrainMVP);
+        TerrainShaders.setMat4("model", terrainModel); 
 
         glBindVertexArray(terrainVAO);
         glDrawElements(GL_TRIANGLES, MAP_SIZE * 32, GL_UNSIGNED_INT, 0);
@@ -460,6 +543,10 @@ int main()
 
         //Draw Water
         WaterShaders.use();
+        WaterShaders.setVec3("lightColor", lightCol);
+        WaterShaders.setVec3("lightPos", lightPosition);
+
+
         glUniform1i(glGetUniformLocation(WaterShaders.ID, "texture1"), 0);
         WaterShaders.setInt("texture2", 1);
 
@@ -470,6 +557,7 @@ int main()
 
         mat4 waterMVP = projection * view * waterModel;
         WaterShaders.setMat4("mvpIn", waterMVP);
+        WaterShaders.setMat4("model", waterModel); 
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
@@ -481,8 +569,26 @@ int main()
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
+        //Draw Light Cube
+        LightShader.use();
+
+        mat4 lightModel = mat4(1.0f);
+        lightModel = translate(lightModel, lightPosition);
+        lightModel = scale(lightModel, vec3(0.2f));
+
+        mat4 lightMVP = projection * view * lightModel;
+        LightShader.setMat4("mvpIn", lightMVP);
+
+        glBindVertexArray(lightVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glBindVertexArray(0);
+
+
         //Switch back to model shader
         Shaders.use();
+        Shaders.setVec3("lightColor", lightCol);
+        Shaders.setVec3("lightPos", lightPosition);
 
         //Ufo
         model = mat4(1.0f); //Model matrix
@@ -501,6 +607,7 @@ int main()
 
         //Ufo
         SetMatrices(Shaders);
+        Shaders.setMat4("model", model); 
         Ufo.Draw(Shaders);
 
         //Plane (changes MVP in relation to past values)
@@ -515,6 +622,7 @@ int main()
         projection = perspective(radians(45.0f), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
 
         SetMatrices(Shaders);
+        Shaders.setMat4("model", model);
         Plane.Draw(Shaders);
 
         //Ufo (reorient MVP back to starting values)

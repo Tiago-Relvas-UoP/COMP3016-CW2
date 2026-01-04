@@ -145,6 +145,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragmentShader.frag" />
+    <None Include="shaders\LightFragmentShader.frag" />
+    <None Include="shaders\LightVertexShader.vert" />
     <None Include="shaders\terrainFragmentShader.frag" />
     <None Include="shaders\terrainVertexShader.vert" />
     <None Include="shaders\vertexShader.vert" />
