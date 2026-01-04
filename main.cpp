@@ -121,7 +121,7 @@ int main()
     Shader WaterShaders("shaders/waterVertexShader.vert", "shaders/waterFragmentShader.frag");
     Shader TerrainShaders("shaders/terrainVertexShader.vert", "shaders/terrainFragmentShader.frag");
     Shader LightShader("shaders/LightVertexShader.vert", "shaders/LightFragmentShader.frag");
-    Model Ufo("media/ufo_FBX/Low_poly_UFO.FBX"); // Ufo FBX
+    Model Ufo("media/ufo2/model/Low_poly_UFO.FBX"); // Ufo FBX
     // C:\Users\drtie\Documents\!Uni\COMP3016\COMP3016 - CW2\media\ufo_FBX
     // Model Ufo("media/ufo/UFO_obj/UFO.obj"); // Ufo
     Model Plane("media/plane/floatplane/floatplane.obj"); // Plane
@@ -592,9 +592,10 @@ int main()
 
         //Ufo
         model = mat4(1.0f); //Model matrix
-        model = translate(model, vec3(-9.0f, -2.f, -9.f)); //Elevation to look upon terrain
-        model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 1.0f, 0.0f)); //Looking straight forward
-        model = scale(model, vec3(0.5f, 0.5f, 0.5f)); //Ufo //Scaling to zoom in
+        model = translate(model, vec3(-9.0f, -1.f, -9.f)); //Elevation to look upon terrain
+        model = rotate(model, radians(90.0f), vec3(-1.0f, 0.0f, 0.0f));
+        model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 0.0f, 1.0f)); //Looking straight forward
+        model = scale(model, vec3(0.07f, 0.07f, 0.07f)); //Ufo //Scaling to zoom in
         // model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 1.0f, 0.0f)); //Looking straight forward
         //model = translate(model, vec3(-6.0f, -1.5f, -7.5f)); //Elevation to look upon terrain
 
@@ -612,7 +613,7 @@ int main()
 
         //Plane (changes MVP in relation to past values)
         model = mat4(1.0f); //Model matrix
-        model = translate(model, vec3(-3.5f, -2.f, -9.f)); //Elevation to look upon terrain
+        model = translate(model, vec3(-3.5f, -1.4f, -9.f)); //Elevation to look upon terrain
         model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); //Looking straight forward
         model = scale(model, vec3(0.025f, 0.025f, 0.025f)); //Plane //Scaling to zoom in
         //model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); //Looking straight forward
