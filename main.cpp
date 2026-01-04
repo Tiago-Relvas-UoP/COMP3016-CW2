@@ -27,8 +27,13 @@
 //FASTNOISE
 #include "FastNoiseLite.h"
 
+//IRRKLANG
+#include "irrKlang.h"
+
+//namespaces
 using namespace std;
 using namespace glm;
+using namespace irrklang;
 
 //Window dimensions
 int windowWidth;
@@ -116,6 +121,12 @@ int main()
     {
         cout << "GLAD failed to initialise\n";
         return -1;
+    }
+
+    //Initialization of IRRKLANG Sound Engine
+    ISoundEngine* engine = createIrrKlangDevice();
+    if (!engine) {
+        return 0;
     }
 
     //Shaders Loading  
@@ -533,6 +544,9 @@ int main()
     //Depth Testing
     glEnable(GL_DEPTH_TEST);
 
+    //Ambience Sound
+    engine->play2D("media/ambience.wav", true);
+
     //Render loop
     while (glfwWindowShouldClose(window) == false)
     {
@@ -682,9 +696,11 @@ int main()
         glfwPollEvents(); //Queries all GLFW events (Mouse, keyboard, etc.)
     }
 
+    //Clean up audio after program closes
+    engine->drop();
+
     //Safely terminates GLFW
     glfwTerminate();
-
     return 0;
 }
 

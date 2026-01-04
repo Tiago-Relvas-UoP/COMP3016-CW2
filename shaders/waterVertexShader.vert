@@ -29,5 +29,4 @@ void main()
     colourFrag = colourVertex;
     // Sending texture coordinates to next stage
     TexCoord = aTexCoord;
-
 }

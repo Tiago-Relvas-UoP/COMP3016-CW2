@@ -6,7 +6,7 @@ layout (location = 2) in vec2 textureVertex;
 
 //Model-View-Projection Matrix
 uniform mat4 mvpIn;
-uniform mat4 model;
+uniform mat4 model; // Model Matrix
 
 //Outputs (Texture/Fragment pos)
 out vec2 textureFrag;

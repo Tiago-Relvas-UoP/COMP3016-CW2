@@ -10,11 +10,9 @@ layout (location = 1) in vec3 colourVertex;
 uniform mat4 mvpIn;
 uniform mat4 model;
 
-
 // Colour to send
 out vec3 FragPos;
 out vec3 colourFrag;
-
 
 void main()
 {
