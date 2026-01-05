@@ -36,8 +36,8 @@ using namespace glm;
 using namespace irrklang;
 
 //Window dimensions
-int windowWidth;
-int windowHeight;
+int windowWidth = 1280;
+int windowHeight = 720;
 
 //VAO vertex attribute positions in correspondence to vertex attribute type
 enum VAO_IDs { Triangles, Indices, Colours, Textures, NumVAOs = 2 };
@@ -79,6 +79,11 @@ float deltaTime = 0.0f;
 //Last value of time change
 float lastFrame = 0.0f;
 
+// PLANE VARIABLES
+float bobSpeed = 1.0f; // Controls how fast the plane bobs
+float bobAmount = 0.3f; // Controls vertical movement distance
+float tiltAmount = 2.0f; // Controls tilt angle in degrees
+
 // Procedurally-generated Terrain (clouds) config
 #define RENDER_DISTANCE 128 //Render width of map
 #define MAP_SIZE RENDER_DISTANCE * RENDER_DISTANCE // Size of map in x & z space
@@ -98,9 +103,7 @@ int main()
     //Initialisation of GLFW
     glfwInit();
     //Initialisation of 'GLFWwindow' object
-    windowWidth = 1280;
-    windowHeight = 720;
-    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "CW2", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "Peaceful Coexistence - CW2", NULL, NULL);
 
     //Checks if window has been successfully instantiated
     if (window == NULL)
@@ -137,7 +140,7 @@ int main()
     
     // 3D Model Loading
     Model Ufo("media/ufo2/model/Low_poly_UFO.FBX"); // Ufo FBX
-    Model Plane("media/plane/floatplane/floatplane.obj"); // Plane
+    Model Plane("media/plane/floatplane/floatplane.obj"); // Plane OBJ
 
     // Activates main shader
     Shaders.use();
@@ -568,13 +571,35 @@ int main()
 
         // !! LIGHT POSITION / COLOR !! 
         vec3 lightPosition = vec3(0.0f, 5.0f, 0.0f);
-        vec3 lightCol = vec3(1.0f, 0.98f, 0.83f);
+        vec3 lightCol = vec3(0.8f, 0.8f, 0.8f);
 
         // !! DRAW TERRAIN !!
         TerrainShaders.use();
         TerrainShaders.setVec3("lightColor", lightCol);
         TerrainShaders.setVec3("lightPos", lightPosition); 
         TerrainShaders.setVec3("viewPos", cameraPosition);
+
+        //Current Time for animation
+        float time = static_cast<float>(glfwGetTime());
+        //Time Scale (How fast the Terrain (clouds) change)
+        float timeScale = 1.0f;
+
+        // Regenerate height values with time offset
+        int i = 0;
+        for (int y = 0; y < RENDER_DISTANCE; y++)
+        {
+            for (int x = 0; x < RENDER_DISTANCE; x++)
+            {
+                // Add time as third dimension to create smooth movement
+                terrainVertices[i][1] = TerrainNoise.GetNoise((float)x, (float)y, time * timeScale);
+                i++;
+            }
+        }
+
+        // Updates Terrain (Clouds) VBO with new data
+        glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(terrainVertices), terrainVertices);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         // Terrain (clouds) model matrix transformations
         mat4 terrainModel = mat4(1.0f);
@@ -672,9 +697,17 @@ int main()
         // (changes MVP in relation to past values)
 
         // Plane model matrix transformations
+        //model = mat4(1.0f); //Model matrix
+        //model = translate(model, vec3(-3.5f, -1.4f, -9.f)); // World Position
+        //model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); // No aditional rotation. It's already good enough
+       // model = scale(model, vec3(0.025f, 0.025f, 0.025f)); // Scaled down to appropriate size (1.0f is too large)
+
+        float bobOffset = sin((float)glfwGetTime() * bobSpeed) * bobAmount;
+        float tiltAngle = sin((float)glfwGetTime() * bobSpeed) * tiltAmount;
+
         model = mat4(1.0f); //Model matrix
-        model = translate(model, vec3(-3.5f, -1.4f, -9.f)); // World Position
-        model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); // No aditional rotation. It's already good enough
+        model = translate(model, vec3(-3.5f, -1.4f + bobOffset, -9.f)); // World Position with vertical bobbing
+        model = rotate(model, radians(tiltAngle), vec3(1.0f, 0.0f, 0.0f)); // Pitching motion
         model = scale(model, vec3(0.025f, 0.025f, 0.025f)); // Scaled down to appropriate size (1.0f is too large)
 
         //Projection matrix
