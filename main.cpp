@@ -694,17 +694,13 @@ int main()
         Ufo.Draw(Shaders);
 
         // !! PLANE MODEL !! 
-        // (changes MVP in relation to past values)
 
-        // Plane model matrix transformations
-        //model = mat4(1.0f); //Model matrix
-        //model = translate(model, vec3(-3.5f, -1.4f, -9.f)); // World Position
-        //model = rotate(model, radians(0.0f), vec3(1.0f, 0.0f, 0.0f)); // No aditional rotation. It's already good enough
-       // model = scale(model, vec3(0.025f, 0.025f, 0.025f)); // Scaled down to appropriate size (1.0f is too large)
-
+        // Position/Rotation variables. Will determine how much the plane should move in the Y-Axis, and how much rotation should be applied in the X-Axis.
         float bobOffset = sin((float)glfwGetTime() * bobSpeed) * bobAmount;
         float tiltAngle = sin((float)glfwGetTime() * bobSpeed) * tiltAmount;
 
+        // Plane model matrix transformations
+        // (changes MVP in relation to past values)
         model = mat4(1.0f); //Model matrix
         model = translate(model, vec3(-3.5f, -1.4f + bobOffset, -9.f)); // World Position with vertical bobbing
         model = rotate(model, radians(tiltAngle), vec3(1.0f, 0.0f, 0.0f)); // Pitching motion
