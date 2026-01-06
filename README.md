@@ -21,11 +21,11 @@ This project used the following dependencies:
 - IrrKlang: Responsible for audio playback (Ambience Noise)
 - FastNoiseLite: Responsible for providing Perlin Noise, used in the procedurally generated terrain (Clouds)
 
-## Use of AI 
-AI was used in the following capacity throughout the project:
-- Code Assistance:
-  (1) Used as a Cleanup/Suggestions tool for existing code.
-  (2) Used to find exact vertices coordinates to match water surface below clouds (Terrain) surface
+## Sample Screens
+![alt text](https://github.com/Tiago-Relvas-UoP/COMP3016-CW2/blob/main/sample-screens/sample1.png)
+![alt text](https://github.com/Tiago-Relvas-UoP/COMP3016-CW2/blob/main/sample-screens/sample2.png)
+![alt text](https://github.com/Tiago-Relvas-UoP/COMP3016-CW2/blob/main/sample-screens/sample3.png)
+![alt text](https://github.com/Tiago-Relvas-UoP/COMP3016-CW2/blob/main/sample-screens/sample4.png)
 
 ## Used Programming Pattern
 
@@ -741,3 +741,9 @@ else
 - This is also true to animating the plane. I took advantage of the existing implementation with the UFOs rotation that use glfwGetTime() function and applied to to both its rotation and position (translate). 
 - If I were to expand the project in the future, I would look into implement a bunch other features such as an animated light source, 3D sound sources to both ASSIMP Models, moving water (while keeping it a 3D Cube), and a skybox.
 - For more advanced features, I wanted to look into animating the front of the planes front propeller but due to lack of knowledge I refrained from doing it for this current scope.
+
+## Use of AI 
+AI was used in the following capacity throughout the project:
+- Code Assistance:
+  (1) Used as a Cleanup/Suggestions tool for existing code.
+  (2) Used to find exact vertices coordinates to match water surface below clouds (Terrain) surface
