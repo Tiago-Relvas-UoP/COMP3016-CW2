@@ -8,7 +8,6 @@ in vec3 FragPos;
 
 // Lighting uniforms
 uniform vec3 lightPos;
-uniform vec3 viewPos;
 uniform vec3 lightColor;
 
 void main()

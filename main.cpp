@@ -573,7 +573,7 @@ int main()
         ProcessUserInput(window); //Takes user input
 
         // !! RENDERING !!
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f); //Colour to display on cleared window // Blue: (0.25f, 0.0f, 1.0f, 1.0f);
+        glClearColor(0.00, 0.05, 0.17, 1.0); //Colour to display on cleared window // Blue: (0.25f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); //Clears the colour buffer
         glClear(GL_DEPTH_BUFFER_BIT); //Clears depth buffer for proper 3D rendering
 

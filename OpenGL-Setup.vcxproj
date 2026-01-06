@@ -74,6 +74,11 @@
     <IncludePath>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\include;C:\Users\Public\Assimp\Source\assimp\include;C:\Users\Public\Assimp\Binaries\include;C:\Users\Public\OpenGL\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\lib;C:\Users\Public\Assimp\Binaries\lib\Release;C:\Users\Public\OpenGL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\include;C:\Users\Public\Assimp\Source\assimp\include;C:\Users\Public\Assimp\Binaries\include;C:\Users\Public\OpenGL\include;$(IncludePath)</IncludePath>
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\lib;C:\Users\Public\Assimp\Binaries\lib\Release;C:\Users\Public\OpenGL\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -126,6 +131,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mt.lib;irrKlang.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
