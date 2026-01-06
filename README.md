@@ -7,7 +7,7 @@ This 3D Scene features:
 - A 3D Water Surface that blends in 2 mixed textures, and a gradient Color
 - Procedurally generated clouds using Perlin Noise that continously fluctuate over the runtime of the application
 - 3D Animated Models: An UFO, and a plane
-- Dynamic Lighting source (Sun) that illuminates all scene objects
+- Static Lighting source (Sun) that illuminates all scene objects
 - Fluid First-person movement (WASD/Camera)
 - A relaxing Ambience music
 
@@ -16,6 +16,7 @@ This project used the following dependencies:
 - GLAD: Essential Library for a bunch of OpenGL Functions.
 - GLFW: Responsible for allowing Window Creationg, context management and all input handling.
 - GLM: Math. Library responsible for all vector/matrix operations and transformations.
+
 - Assimp: Responsible for loading all 3D Models within the scene that use OBJ/FBX format.
 - stb_image: Responsible for loading images, used as textures.
 - IrrKlang: Responsible for audio playback (Ambience Noise)
@@ -693,9 +694,6 @@ uniform vec3 lightColor;
 vec3 result = (ambient + diffuse) * colourFrag;
 FragColor = vec4(result, 1.0f); // Final output
 ```
-
-## Sample screens.
-- Sample screens go here
 
 ## Exception handling 
 - GLFW Window not initializing
