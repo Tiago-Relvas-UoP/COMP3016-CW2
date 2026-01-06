@@ -1,5 +1,4 @@
-# COMP3016-CW2
-Repo for COMP3016, Coursework 2
+# PEACEFUL COEXISTENCE - CW2
 
 ## Project Description
 "Peaceful coexistence" is a simple immersive 3D Scene built in OpenGL that explores a human and an alien peacefully flying in the middle of the ocean, above the clouds
@@ -743,5 +742,7 @@ else
 ```
 
 ## (Brief) Evaluation
-- Self-Evaluation
-
+- While the project is relatively simple, the biggest achievement for me was finding a way to animate all models (excluding the sun/water). This is especially true for the clouds, as I managed to use existing logic to my advantage in order to procedurally animate them.
+- This is also true to animating the plane. I took advantage of the existing implementation with the UFOs rotation that use glfwGetTime() function and applied to to both its rotation and position (translate). 
+- If I were to expand the project in the future, I would look into implement a bunch other features such as an animated light source, 3D sound sources to both ASSIMP Models, moving water (while keeping it a 3D Cube), and a skybox.
+- For more advanced features, I wanted to look into animating the front of the planes front propeller but due to lack of knowledge I refrained from doing it for this current scope.
