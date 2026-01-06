@@ -21,17 +21,19 @@ This project used the following dependencies:
 - IrrKlang: Responsible for audio playback (Ambience Noise)
 - FastNoiseLite: Responsible for providing Perlin Noise, used in the procedurally generated terrain (Clouds)
 
-## Use of AI description.
-- Explain AI use in here
+## Use of AI 
+AI was used in the following capacity throughout the project:
+- Code Assistance:
+  (1) Used as a Cleanup/Suggestions tool for existing code.
+  (2) Used to find exact vertices coordinates to match water surface below clouds (Terrain) surface
 
-## Game programming patterns that you used.
+## Used Programming Pattern
 
-### Singleton
-- The most prominent programming pattern present in the program.
+### Global Configuration Pattern
 - Multiple variables are declared in the global scope as to improve readability and enable easier value changes
 - These variables include window dimensions, Render Distance (For the Clouds Terrain), Camera Settings, etc..
 
-```ruby
+```cpp
 // DEFINED BEFORE THE MAIN LOOP
 //Window dimensions
 int windowWidth = 1280;
@@ -61,10 +63,10 @@ float cameraLastYPos = 600.0f / 2.0f;
 ```
 
 ### Update Method Pattern
-- The main loop of the application has multiple time-based processes (Take advantage of glfwGetTime())
-- Includes animation changes to the Clouds Terrain, and the UFO/Plane Models each frame
+- Multiple object states are updated each frame based on the currently elapsed time (takes advantage of glfwGetTime())
+- Ensures that existing animations (E.g. height changes to cloud Terrain, rotations/position changes to the UFO & Plane 3D models) are frame-independent, and smoother.
 
-```ruby
+```cpp
 // PLANE MODEL ANIMATIONS EXAMPLE
 // Position/Rotation variables. Will determine how much the plane should move in the Y-Axis, and how much rotation should be applied in the X-Axis.
 float bobOffset = sin((float)glfwGetTime() * bobSpeed) * bobAmount;
@@ -79,9 +81,9 @@ model = rotate(model, radians(tiltAngle), vec3(1.0f, 0.0f, 0.0f)); // Pitching m
 
 ### Window (GLFW)  & GLAD Initialization 
 - On startup, the application starts a GLFW window with set dimensions (1280x720).
-- First, GLFW is initialized with "glfwInit();". Once this is done, we call a function to lock and hide the cursor in the window, and finally we bind OpenGL context to the window
+- First, GLFW is initialized with "glfwInit();". Once this is done, we call a function to lock and hide the cursor in the window, and finally we bind OpenGL context to the window.
 
-```ruby
+```cpp
 //Initialisation of GLFW
 glfwInit();
 //Initialisation of 'GLFWwindow' object
@@ -92,9 +94,9 @@ glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 glfwMakeContextCurrent(window);
 ```
 
-- After this is done, an attempt to initialize glad is made, returning an error if it fails to do so
+- After this is done, an attempt to initialize glad is made, returning an error if it fails to do so.
 
-```ruby
+```cpp
 //Initialisation of GLAD
 if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 {
@@ -104,10 +106,10 @@ if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 ```
 
 ### Texture Loading (stb_image)
-- Two textures are loaded for use in the Water model: A seamless water texture, and a signature texture:
-- These textures use repeat wrapping and linear mipmap filtering properties in order to achieve a smooth appearance, regardless of distance
+- Two textures are loaded for use in the Water model: A seamless water texture, and a brighter water texture:
+- These textures use repeat wrapping and linear mipmap filtering properties in order to achieve a smooth appearance, regardless of distance.
 
-```ruby
+```cpp
 // WATER TEXTURE (1ST)
 glGenTextures(1, &texture1);
 glBindTexture(GL_TEXTURE_2D, texture1);
@@ -138,7 +140,7 @@ stbi_image_free(data);
 - Vertices define the position of the faces, the colors (Blue Shade/Gradient), and texture coordinates.
 - Indices then define the 36 Triangles that form the six faces in the cube.
 
-```
+```cpp
 //Water vertices (Squashed down Cube)
 float waterVertices[] = {
     // Front face
@@ -193,7 +195,7 @@ unsigned int waterIndices[] = {
 ```
 - After this, the VAO, VBO and EBO are configured with the three vertex attribute in mind (As previously mention, these include the position, color and texture):
 
-```ruby
+```cpp
 //Sets index of water VAO
 glGenVertexArrays(1, &waterVAO);
 //Sets indexes of water buffer objects
@@ -232,7 +234,7 @@ glEnableVertexAttribArray(2);
 - Then, we reset all transformations using mat4 back to default, and afterwards apply all necessary changes to the Water Model
 - MVP Matrix is then calculated, and before drawing the water using indexed rendering, the textures are binded using 0 and 1 (Since there are two textures)
 
-```ruby
+```cpp
 // !! DRAW WATER !!
 WaterShaders.use();
 WaterShaders.setVec3("lightColor", lightCol);
@@ -270,30 +272,23 @@ glBindVertexArray(0);
 - This provides the possibility to include Height variation and Cellular noise (For different colors within the generations)
 - Two noise generaters were initialized for each, each configured with random seeds and a configured frequency
 
-```ruby
-// Assigning perlin noise type for map
-FastNoiseLite TerrainNoise;
-// Setting noise type for Perlin
-TerrainNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-// Sets the noise scale
-TerrainNoise.SetFrequency(0.05f);
-// Generates a random seed between integers 0 & 100
-int terrainSeed = rand() % 100;
-// Sets seed for noise
-TerrainNoise.SetSeed(terrainSeed);
-
+```cpp
+// Terrain Noise
+FastNoiseLite TerrainNoise; // Assigning perlin noise type for map
+TerrainNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin); // Setting noise type for Perlin
+TerrainNoise.SetFrequency(0.05f);  // Sets the noise scale
+TerrainNoise.SetSeed(rand() % 100); // Sets a random seed for noise (Between integers 0 & 100)
 // Biome Noise
-FastNoiseLite BiomeNoise;
-BiomeNoise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
-BiomeNoise.SetFrequency(0.05f);
-int biomeSeed = rand() % 100;
-BiomeNoise.SetSeed(biomeSeed);
+FastNoiseLite BiomeNoise; // Assigning celular noise type for map
+BiomeNoise.SetNoiseType(FastNoiseLite::NoiseType_Cellular); // Setting noise type for Cellular
+BiomeNoise.SetFrequency(0.05f); // Sets the noise scale
+BiomeNoise.SetSeed(rand() % 100);// Sets a random seed for noise (Between integers 0 & 100)
 ```
 
 - For height and color generation, the terrain vertices arrays store the position and color data (Each vertex has 6 floats).
 - Perlin noise gives us values for Height, and colors are then assigned based on the value on the Cellular Noise (Colors include: White, Grey and Dark Grey)
 
-```ruby
+```cpp
 // Generate height and color data for each vertex
 for (int y = 0; y < RENDER_DISTANCE; y++)
 {
@@ -329,7 +324,7 @@ for (int y = 0; y < RENDER_DISTANCE; y++)
 
 - The Grid position is then calculated using a 0.0625-unit spacing value to form a grid in the X/Z coordinates in the scene
 
-```ruby
+```cpp
 // Positions to start drawing from
 float drawingStartPosition = 1.0f;
 float columnVerticesOffset = drawingStartPosition;
@@ -364,7 +359,7 @@ for (int i = 0; i < MAP_SIZE; i++)
 
 - Finally, the last snippet in the generation code involves indice generation, these being responsible for forming two triangles per square in the grid in order to create the final mesh
 
-```ruby
+```cpp
 //Generation of height map indices
 GLuint terrainIndices[trianglesGrid][3];
 
@@ -409,7 +404,7 @@ for (int i = 0; i < trianglesGrid - 1; i += 2)
 - Moving to the Render Loop, in order to animate the terrain, the height values are regenerated each frame. This uses time (utilizing glfwGetTime()), and a timeScale float (which takes into account how fast it should change per frame)
 - Once this is determined, then the Terrain (Clouds) VBO is updated
 
-```ruby
+```cpp
 //Current Time for animation
 float time = static_cast<float>(glfwGetTime());
 //Time Scale (How fast the Terrain (clouds) change)
@@ -436,7 +431,7 @@ glBindBuffer(GL_ARRAY_BUFFER, 0);
 - Finally, the Terrain is drawn into the scene using the same technique used with water.
 - Transformations are reset using mat4 before any scaling/rotation/position is applied, the MVP matrix is calculated and finally the terrain is drawn using indexed rendering
 
-```ruby
+```cpp
 // Terrain (clouds) model matrix transformations
 mat4 terrainModel = mat4(1.0f);
 terrainModel = scale(terrainModel, vec3(2.0f, 2.0f, 2.0f));
@@ -458,7 +453,7 @@ glBindVertexArray(0);
 - The Light in the scene is rendered as a small white cube, positioned above everything else.
 - sunVertices define the vertices for the cube
 
-```ruby
+```cpp
 float sunVertices[] = {
     -0.5f, -0.5f, -0.5f,
      0.5f, -0.5f, -0.5f,
@@ -472,7 +467,7 @@ float sunVertices[] = {
 - Similiar to the other models (Water/Clouds), the VAO/VBO are then created and buffered.
 - This time, no EBO (ELement Buffer Object) is created, and two VAOs are created: sunVAO and lightVAO
 
-```ruby
+```cpp
 //Sets index of sun VAO
 glGenVertexArrays(1, &sunVAO);
 
@@ -513,7 +508,7 @@ glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 - In the render loop, the lighting position and color is defined, and afterwards passed into the shaders of all other models
 - Example below shows these properties being passed to the Terrain Shader
 
-```ruby
+```cpp
 // !! LIGHT POSITION / COLOR !! 
 vec3 lightPosition = vec3(0.0f, 5.0f, 0.0f);
 vec3 lightCol = vec3(0.8f, 0.8f, 0.8f);
@@ -528,7 +523,7 @@ TerrainShaders.setVec3("viewPos", cameraPosition);
 - Finally, following the other model examples, its drawn into the scene.
 - This time, however, Array Rendering is used rather than indice rendering.
 
-```ruby
+```cpp
 // !! DRAW SUN/LIGHT CUBE !!
 LightShader.use();
 
@@ -551,7 +546,7 @@ glBindVertexArray(0);
 - Using Assimp, the models are loaded before the render loop.
 - Two formats were used: FBX (For UFO) and OBJ (For Plane)
 
-```ruby
+```cpp
 // 3D Model Loading
 Model Ufo("media/ufo2/model/Low_poly_UFO.FBX"); // Ufo FBX
 Model Plane("media/plane/floatplane/floatplane.obj"); // Plane OBJ
@@ -559,7 +554,7 @@ Model Plane("media/plane/floatplane/floatplane.obj"); // Plane OBJ
 
 - In the render loop, before drawing the model we first call their appropriate shaders
 
-```ruby
+```cpp
 Shaders.use();
 ```
 
@@ -567,13 +562,14 @@ Shaders.use();
 - The UFO is animated: It continously rotates in the Y-Axis. This is achieved by taking advantage of glfwGetTime(), as each time the loop runs its value updates, affecting the rotation value
 - Afterwards, the UFO is drawn
 
-```ruby
+```cpp
+// Position/Rotation variables declared before main, as global variables
 // Ufo model matrix transformations
 model = mat4(1.0f); //Model matrix
-model = translate(model, vec3(-9.0f, -1.f, -9.f)); // World Position
-model = rotate(model, radians(90.0f), vec3(-1.0f, 0.0f, 0.0f)); // Initial rotation
+model = translate(model, ufoPosition); // World Position
+model = rotate(model, radians(ufoInitialRotation), vec3(-1.0f, 0.0f, 0.0f)); // Initial rotation
 model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 0.0f, 1.0f)); // Continous rotation over time in the Z-Axis
-model = scale(model, vec3(0.07f, 0.07f, 0.07f)); // Scaled down to appropriate size (1.0f is too large)
+model = scale(model, vec3(ufoScale)); // Scaled down to appropriate size (1.0f is too large)
 
 // Draws UFO after setting matrices 
 SetMatrices(Shaders);
@@ -584,7 +580,7 @@ Ufo.Draw(Shaders);
 - The plane is also animated: Overtime, it bobs up and down overtime, and tilts to add in smoothness (to simulate flying)
 - This is achieved by setting three global variables:
 
-```ruby
+```cpp
 // PLANE VARIABLES
 float bobSpeed = 1.0f; // Controls how fast the plane bobs
 float bobAmount = 0.3f; // Controls vertical movement distance
@@ -594,7 +590,7 @@ float tiltAmount = 2.0f; // Controls tilt angle in degrees
 - Then, in the render loop we define a bobOffset and tiltAngle variables that determine how much the plane bobs (moves in the Y-Axis) and how much it tilts
 - Both take into consideration the bobSpeed variable (Animation Speed)
 
-```ruby
+```cpp
 float bobOffset = sin((float)glfwGetTime() * bobSpeed) * bobAmount;
 float tiltAngle = sin((float)glfwGetTime() * bobSpeed) * tiltAmount;
 ```
@@ -603,12 +599,14 @@ float tiltAngle = sin((float)glfwGetTime() * bobSpeed) * tiltAmount;
 - Translate takes the bobOffset so it can move the plane accordingly, whilst the rotation takes the tiltAngle into account.
 - Since these values change each time the loop runs, the plane position/rotation is always updated as those variables value is always changing
 
-```
+```cpp
+// Plane model matrix transformations
 model = mat4(1.0f); //Model matrix
-model = translate(model, vec3(-3.5f, -1.4f + bobOffset, -9.f)); // World Position with vertical bobbing
+model = translate(model, planePosition + vec3(0.0f, bobOffset, 0.0f)); // World Position with vertical bobbing
 model = rotate(model, radians(tiltAngle), vec3(1.0f, 0.0f, 0.0f)); // Pitching motion
-model = scale(model, vec3(0.025f, 0.025f, 0.025f)); // Scaled down to appropriate size (1.0f is too large)
+model = scale(model, vec3(planeScale)); // Scaled down to appropriate size (1.0f is too large)
 
+// Draws Plane after setting matrices 
 SetMatrices(Shaders);
 Shaders.setMat4("model", model);
 Plane.Draw(Shaders);
@@ -619,7 +617,7 @@ Plane.Draw(Shaders);
 - The Vertex Shaders are responsible for calculating Fragmeent Positiosn in the scene, alongside applying essential transfomrations to object vertices, sending colour coordinates to the fragment shaders and also the textures (Note: Not all of this apply to all vertex shaders, so for instance we don't pass any colors in the models vertex shaders so this is excluded).
 - Example (From models vertex shader)
 
-```ruby
+```cpp
 #version 460
 //Triangle position with values retrieved from main.cpp
 layout (location = 0) in vec3 position;
@@ -647,7 +645,7 @@ void main()
 
 - The Fragment Shaders, having received these information, are then going to process how lighting, textures and colors should be process in the scene.
 
-```ruby
+```cpp
 #version 460
 //Colour value to send to next stage
 out vec4 FragColor;
@@ -690,14 +688,11 @@ uniform vec3 lightColor;
 
 - The final output, which is outsourced to the program, is going to take into consideration the calculated lighting components along with other properties, such as Texture/Vertex RGB Colors, and the final variable determines the Alpha Channel, either set to 1 or using the Textures Alpha component (if available)
 
-```ruby
+```cpp
 // Terrain (Clouds) Fragment Shader example
 vec3 result = (ambient + diffuse) * colourFrag;
 FragColor = vec4(result, 1.0f); // Final output
 ```
-
-## UML design diagram if any
-- If any UML diagrams, put here
 
 ## Sample screens.
 - Sample screens go here
@@ -715,7 +710,7 @@ if (window == NULL)
 ```
 
 - GLAD not initializing
-```
+```cpp
 //Initialisation of GLAD
 if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 {
@@ -725,7 +720,7 @@ if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 ```
 
 - Texture failed to load
-```
+```cpp
 // load and generate the texture
 int width, height, nrChannels;
 unsigned char* data = stbi_load("media/textures/seamlesswater.jpg", &width, &height, &nrChannels, 0);
