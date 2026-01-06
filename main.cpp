@@ -67,6 +67,11 @@ bool mouseFirstEntry = true;
 float cameraLastXPos = 800.0f / 2.0f;
 float cameraLastYPos = 600.0f / 2.0f;
 
+// FOV value + nearPlane/farPlane value for clipping purposes
+const float fov = 90.0f;
+const float nearPlane = 0.1f;
+const float farPlane = 100.0f;
+
 //Model-View-Projection Matrix
 mat4 mvp;
 mat4 model;
@@ -79,7 +84,15 @@ float deltaTime = 0.0f;
 //Last value of time change
 float lastFrame = 0.0f;
 
+// UFO VARIABLES
+const vec3 ufoPosition = vec3(-9.0f, -1.0f, -9.0f);
+const float ufoScale = 0.07f;
+const float ufoInitialRotation = 90.0f;
+
 // PLANE VARIABLES
+const vec3 planePosition = vec3(-2.5f, -1.4f, -9.0f);
+const float planeScale = 0.025f;
+
 float bobSpeed = 1.0f; // Controls how fast the plane bobs
 float bobAmount = 0.3f; // Controls vertical movement distance
 float tiltAmount = 2.0f; // Controls tilt angle in degrees
@@ -91,6 +104,8 @@ float tiltAmount = 2.0f; // Controls tilt angle in degrees
 const int squaresRow = RENDER_DISTANCE - 1; // Amount of chunks across one dimension
 const int trianglesPerSquare = 2; // Two triangles per square to form a 1x1 chunk
 const int trianglesGrid = squaresRow * squaresRow * trianglesPerSquare; // Amount of triangles on map
+const float whiteColorThreshold = -0.75f; // Height Threshold for White Color
+const float greyColorThreshold = -0.50f; // Height Threshold for Grey Color
 
 // Buffer Objects for Terrain (Clouds), Water and Sun/Light Objects
 GLuint terrainVAO, terrainVBO, terrainEBO; // Terrain VAO, VBO and EBO
@@ -139,31 +154,28 @@ int main()
     Shader LightShader("shaders/LightVertexShader.vert", "shaders/LightFragmentShader.frag"); // Light Shader
     
     // 3D Model Loading
-    Model Ufo("media/ufo2/model/Low_poly_UFO.FBX"); // Ufo FBX
+    Model Ufo("media/ufo/model/Low_poly_UFO.FBX"); // Ufo FBX
     Model Plane("media/plane/floatplane/floatplane.obj"); // Plane OBJ
+
+    // Audio loading
+    engine->play2D("media/audio/ambience.wav", true); //Ambience Sound
 
     // Activates main shader
     Shaders.use();
 
     // !! CODE SEGMENT FOR TERRAIN (CLOUDS) GENERATION !! 
 
-    // Assigning perlin noise type for map
-    FastNoiseLite TerrainNoise;
-    // Setting noise type for Perlin
-    TerrainNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    // Sets the noise scale
-    TerrainNoise.SetFrequency(0.05f);
-    // Generates a random seed between integers 0 & 100
-    int terrainSeed = rand() % 100;
-    // Sets seed for noise
-    TerrainNoise.SetSeed(terrainSeed);
+    // Terrain Noise
+    FastNoiseLite TerrainNoise; // Assigning perlin noise type for map
+    TerrainNoise.SetNoiseType(FastNoiseLite::NoiseType_Perlin); // Setting noise type for Perlin
+    TerrainNoise.SetFrequency(0.05f);  // Sets the noise scale
+    TerrainNoise.SetSeed(rand() % 100); // Sets a random seed for noise (Between integers 0 & 100)
 
     // Biome Noise
-    FastNoiseLite BiomeNoise;
-    BiomeNoise.SetNoiseType(FastNoiseLite::NoiseType_Cellular);
-    BiomeNoise.SetFrequency(0.05f);
-    int biomeSeed = rand() % 100;
-    BiomeNoise.SetSeed(biomeSeed);
+    FastNoiseLite BiomeNoise; // Assigning celular noise type for map
+    BiomeNoise.SetNoiseType(FastNoiseLite::NoiseType_Cellular); // Setting noise type for Cellular
+    BiomeNoise.SetFrequency(0.05f); // Sets the noise scale
+    BiomeNoise.SetSeed(rand() % 100);// Sets a random seed for noise (Between integers 0 & 100)
 
     // Generation of height map vertices
     GLfloat terrainVertices[MAP_SIZE][6];
@@ -182,13 +194,13 @@ int main()
             // Retrieval of biome to set
             float biomeValue = BiomeNoise.GetNoise((float)x, (float)y);
 
-            if (biomeValue <= -0.75f) // White Color
+            if (biomeValue <= whiteColorThreshold) // White Color
             {
                 terrainVertices[i][3] = 1.0f;
                 terrainVertices[i][4] = 1.0f;
                 terrainVertices[i][5] = 1.0f;
             }
-            else if (biomeValue <= -0.50f){ // Grey Color
+            else if (biomeValue <= greyColorThreshold){ // Grey Color
                 terrainVertices[i][3] = 0.8f;
                 terrainVertices[i][4] = 0.8f;
                 terrainVertices[i][5] = 0.8f;
@@ -210,6 +222,7 @@ int main()
 
     int rowIndex = 0;
 
+    // Assigns x & z positions to create the terrains horizontal grid
     for (int i = 0; i < MAP_SIZE; i++)
     {
         // Generation of x & z vertices for horizontal plane
@@ -522,7 +535,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
-    data = stbi_load("media/textures/signature.png", &width, &height, &nrChannels, 0);
+    data = stbi_load("media/textures/water2.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         std::cout << "Successfully loaded texture" << std::endl;
@@ -547,9 +560,6 @@ int main()
     //Depth Testing
     glEnable(GL_DEPTH_TEST);
 
-    //Ambience Sound
-    engine->play2D("media/ambience.wav", true);
-
     //Render loop
     while (glfwWindowShouldClose(window) == false)
     {
@@ -565,7 +575,7 @@ int main()
         // !! RENDERING !!
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f); //Colour to display on cleared window // Blue: (0.25f, 0.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT); //Clears the colour buffer
-        glClear(GL_DEPTH_BUFFER_BIT); //Might need
+        glClear(GL_DEPTH_BUFFER_BIT); //Clears depth buffer for proper 3D rendering
 
         glDisable(GL_CULL_FACE); //Discards all back-facing triangles
 
@@ -605,7 +615,7 @@ int main()
         mat4 terrainModel = mat4(1.0f);
         terrainModel = scale(terrainModel, vec3(2.0f, 2.0f, 2.0f));
         terrainModel = rotate(terrainModel, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
-        terrainModel = translate(terrainModel, vec3(0.0f, -2.f, -1.5f));
+        terrainModel = translate(terrainModel, vec3(0.0f, -2.0f, -1.5f));
 
         // Calculates and sets MVP matrix for terrain (clouds)
         mat4 terrainMVP = projection * view * terrainModel;
@@ -630,7 +640,7 @@ int main()
         mat4 waterModel = mat4(1.0f);
         waterModel = scale(waterModel, vec3(2.0f, 2.0f, 2.0f));
         waterModel = rotate(waterModel, radians(0.0f), vec3(1.0f, 0.0f, 0.0f));
-        waterModel = translate(waterModel, vec3(0.0f, -2.f, -1.5f));
+        waterModel = translate(waterModel, vec3(0.0f, -2.0f, -1.5f));
 
         // Calculates and sets MVP matrix for water
         mat4 waterMVP = projection * view * waterModel;
@@ -674,19 +684,19 @@ int main()
 
         // !! UFO MODEL !!
 
-        // Ufo model matrix transformations
-        model = mat4(1.0f); //Model matrix
-        model = translate(model, vec3(-9.0f, -1.f, -9.f)); // World Position
-        model = rotate(model, radians(90.0f), vec3(-1.0f, 0.0f, 0.0f)); // Initial rotation
-        model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 0.0f, 1.0f)); // Continous rotation over time in the Z-Axis
-        model = scale(model, vec3(0.07f, 0.07f, 0.07f)); // Scaled down to appropriate size (1.0f is too large)
-
         //Projection matrix
-        projection = perspective(radians(45.0f), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
+        projection = perspective(radians(fov), (float)windowWidth / (float)windowHeight, nearPlane, farPlane);
 
         //Transformations & Drawing
         //Viewer orientation
         view = lookAt(cameraPosition, cameraPosition + cameraFront, cameraUp); //Sets the position of the viewer, the movement direction in relation to it & the world up direction
+
+        // Ufo model matrix transformations
+        model = mat4(1.0f); //Model matrix
+        model = translate(model, ufoPosition); // World Position
+        model = rotate(model, radians(ufoInitialRotation), vec3(-1.0f, 0.0f, 0.0f)); // Initial rotation
+        model = rotate(model, (float)glfwGetTime(), vec3(0.0f, 0.0f, 1.0f)); // Continous rotation over time in the Z-Axis
+        model = scale(model, vec3(ufoScale)); // Scaled down to appropriate size (1.0f is too large)
 
         // Draws UFO after setting matrices 
         SetMatrices(Shaders);
@@ -700,23 +710,15 @@ int main()
         float tiltAngle = sin((float)glfwGetTime() * bobSpeed) * tiltAmount;
 
         // Plane model matrix transformations
-        // (changes MVP in relation to past values)
         model = mat4(1.0f); //Model matrix
-        model = translate(model, vec3(-3.5f, -1.4f + bobOffset, -9.f)); // World Position with vertical bobbing
+        model = translate(model, planePosition + vec3(0.0f, bobOffset, 0.0f)); // World Position with vertical bobbing
         model = rotate(model, radians(tiltAngle), vec3(1.0f, 0.0f, 0.0f)); // Pitching motion
-        model = scale(model, vec3(0.025f, 0.025f, 0.025f)); // Scaled down to appropriate size (1.0f is too large)
-
-        //Projection matrix
-        projection = perspective(radians(45.0f), (float)windowWidth / (float)windowHeight, 0.1f, 100.0f);
+        model = scale(model, vec3(planeScale)); // Scaled down to appropriate size (1.0f is too large)
 
         // Draws Plane after setting matrices 
         SetMatrices(Shaders);
         Shaders.setMat4("model", model);
         Plane.Draw(Shaders);
-
-        //Reorients MVP back to starting values for the next frame
-        model = scale(model, vec3(20.0f, 20.0f, 20.0f));
-        SetMatrices(Shaders);
 
         // !! FRAME FINALIZATION !! 
 
@@ -798,19 +800,19 @@ void ProcessUserInput(GLFWwindow* WindowIn)
     //Extent to which to move in one instance
     const float movementSpeed = 5.0f * deltaTime;
     //WASD controls
-    if (glfwGetKey(WindowIn, GLFW_KEY_W) == GLFW_PRESS)
+    if (glfwGetKey(WindowIn, GLFW_KEY_W) == GLFW_PRESS) // W Key
     {
         cameraPosition += movementSpeed * cameraFront;
     }
-    if (glfwGetKey(WindowIn, GLFW_KEY_S) == GLFW_PRESS)
+    if (glfwGetKey(WindowIn, GLFW_KEY_S) == GLFW_PRESS) // S Key
     {
         cameraPosition -= movementSpeed * cameraFront;
     }
-    if (glfwGetKey(WindowIn, GLFW_KEY_A) == GLFW_PRESS)
+    if (glfwGetKey(WindowIn, GLFW_KEY_A) == GLFW_PRESS) // A Key
     {
         cameraPosition -= normalize(cross(cameraFront, cameraUp)) * movementSpeed;
     }
-    if (glfwGetKey(WindowIn, GLFW_KEY_D) == GLFW_PRESS)
+    if (glfwGetKey(WindowIn, GLFW_KEY_D) == GLFW_PRESS) // D Key
     {
         cameraPosition += normalize(cross(cameraFront, cameraUp)) * movementSpeed;
     }

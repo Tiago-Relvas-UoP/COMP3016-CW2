@@ -33,7 +33,4 @@ void main()
     //Setting of colour coordinates to colour map
     vec3 lighting = ambient + diffuse;
     FragColor = vec4(lighting * texColor.rgb, texColor.a);
-
-    //Setting of colour coordinates to colour map
-    //FragColor = texture(texture_diffuse1, textureFrag);
 }

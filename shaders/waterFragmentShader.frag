@@ -37,13 +37,4 @@ void main()
     vec3 lighting = ambient + diffuse;
     vec3 result = lighting * texColor.rgb * colourFrag;
     FragColor = vec4(result, texColor.a); // Final Output
-    
-    //vec4 texColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5);
-
-    //Setting of colour coordinates to colour map
-    //FragColor = vec4(colourFrag, 1.0f);
-    //FragColor = texture(texture1, TexCoord) * vec4(colourFrag, 1.0f);
-    
-    //UNCOMMENT THIS INCASE OF ERROR
-    //FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5);
 }
