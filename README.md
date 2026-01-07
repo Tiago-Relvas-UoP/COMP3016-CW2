@@ -6,10 +6,18 @@
 This 3D Scene features:
 - A 3D Water Surface that blends in 2 mixed textures, and a gradient Color
 - Procedurally generated clouds using Perlin Noise that continously fluctuate over the runtime of the application
-- 3D Animated Models: An UFO, and a plane
+- 3D Animated Models: An UFO (with a signature), and a plane
 - Static Lighting source (Sun) that illuminates all scene objects
 - Fluid First-person movement (WASD/Camera)
 - A relaxing Ambience music
+
+## THIRD-PARTY ASSETS CREDITS (AND SPECIAL THANKS)
+- Low Poly UFO (FBX model) by JonLundy3D (From [Turbosquid](https://www.turbosquid.com/pt_br/3d-models/free-3ds-model-flying-saucer/1081073))
+- Floatplane (OBJ model) by HuNtEr_3DdD (From [Turbosquid](https://www.turbosquid.com/pt_br/3d-models/lowpoly-floatplane-pbr-3d-model-2446919))
+- Ambience by kanaizo (from [Freesound](https://freesound.org/people/kanaizo/sounds/811838/))
+- Seamless Water Texture from [CADHatch](https://www.cadhatch.com/seamless-water-textures)
+- Seamless Water Texture 2 from [Jessica's Nature Blog](https://natureinfocus.blog/2019/06/18/water-studies-ham-geo-south-ronaldsay-062018/)
+- Special thanks to the holy grail: [LearnOpenGL](https://learnopengl.com)
 
 ## Dependencies used.
 This project used the following dependencies:
@@ -743,5 +751,6 @@ else
 ## Use of AI 
 AI was used in the following capacity throughout the project:
 - Code Assistance:
-  (1) Used as a Cleanup/Suggestions tool for existing code.
-  (2) Used to find exact vertices coordinates to match water surface below clouds (Terrain) surface
+- (1) Used as a Cleanup/Suggestions tool for existing code.
+- (2) Used to find exact vertices coordinates to match water surface below clouds (Terrain) surface
+  
