@@ -71,13 +71,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\include;C:\Users\Public\Assimp\Source\assimp\include;C:\Users\Public\Assimp\Binaries\include;C:\Users\Public\OpenGL\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\lib;C:\Users\Public\Assimp\Binaries\lib\Release;C:\Users\Public\OpenGL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Public\Assimp\Source\assimp\include;C:\Users\Public\Assimp\Binaries\include;$(ProjectDir)dependencies\include;$(ProjectDir)dependencies\include\irrKlang;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)dependencies\include;C:\Users\Public\Assimp\Binaries\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\include;C:\Users\Public\Assimp\Source\assimp\include;C:\Users\Public\Assimp\Binaries\include;C:\Users\Public\OpenGL\include;$(IncludePath)</IncludePath>
-    <LinkIncremental>true</LinkIncremental>
-    <LibraryPath>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\lib;C:\Users\Public\Assimp\Binaries\lib\Release;C:\Users\Public\OpenGL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Public\Assimp\Source\assimp\include;C:\Users\Public\Assimp\Binaries\include;$(ProjectDir)dependencies\include;$(ProjectDir)dependencies\include\irrKlang;$(IncludePath)</IncludePath>
+    <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>$(ProjectDir)dependencies\include;C:\Users\Public\Assimp\Binaries\lib\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -115,8 +115,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32.lib;glew32s.lib;assimp-vc143-mt.lib;irrKlang.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;assimp-vc143-mt.lib;irrKlang.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)dependencies\lib\glfw;$(ProjectDir)dependencies\lib\irrKlang;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,14 +131,13 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\drtie\Documents\! Uni\COMP3016\COMP3016-CW2\irrklang\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glew32s.lib;assimp-vc143-mt.lib;irrKlang.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)dependencies\lib\glfw;$(ProjectDir)dependencies\lib\irrKlang;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;assimp-vc143-mt.lib;irrKlang.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="shaders\LoadShaders.cpp" />
     <ClCompile Include="stbImageLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -148,7 +147,6 @@
     <ClInclude Include="..\..\..\..\..\Public\OpenGL\include\learnopengl\shader_m.h" />
     <ClInclude Include="FastNoiseLite.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="shaders\LoadShaders.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
