@@ -1,5 +1,8 @@
 # PEACEFUL COEXISTENCE - CW2
 
+## Youtube video
+[Link](https://youtu.be/N0AhzRSZ5Kw)
+
 ## Project Description
 "Peaceful coexistence" is a simple immersive 3D Scene built in OpenGL that explores a human and an alien peacefully flying in the middle of the ocean, above the clouds
 
@@ -749,8 +752,9 @@ else
 - For more advanced features, I wanted to look into animating the front of the planes front propeller but due to lack of knowledge I refrained from doing it for this current scope.
 
 ## Use of AI 
+[AI Declaration Form](https://github.com/Tiago-Relvas-UoP/COMP3016-CW2/blob/main/documents/Student%20Declaration%20of%20AI%20Tool%20use%20in%20this%20Assessment.docx)
+
 AI was used in the following capacity throughout the project:
-- Code Assistance:
-- (1) Used as a Cleanup/Suggestions tool for existing code.
-- (2) Used to find exact vertices coordinates to match water surface below clouds (Terrain) surface
-  
+- Code Review/Assistance:
+- (1) Used as a Cleanup/Suggestions tool for existing code 
+- (2) Used to find exact vertices coordinates to match water surface below clouds (Terrain) surface 
