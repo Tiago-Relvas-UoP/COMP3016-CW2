@@ -3,6 +3,17 @@
 ## Youtube video
 [Link](https://youtu.be/N0AhzRSZ5Kw)
 
+## How-to-compile source code
+- Install Visual Studio Community 2022, and select all C++ plugins for compatibility during install
+- Download source code
+- Extract it anywhere
+- Before opening the project file, all dependencies need to be in place. Everything is already placed in the `\dependencies` except Assimp due to its size
+- To download Assimp, navigate to their [Github Page](https://github.com/assimp/assimp/blob/master/Build.md) and follow the Build Instructions. Ensure that ASSIMP Folder is cloned into the following directory: `C:\Users\Public` (So the root of Assimp is: `C:\Users\Public\Assimp`)
+- After successfully downloading Assimp, open the project file. (`OpenGL-CW2.sln`)
+- At the top, select either Debug/Release and 64x/86x (Depending if your system is 64/32 bits).
+- Next to those options, select "Local Windows Debugger"
+- Enjoy!
+
 ## Project Description
 "Peaceful coexistence" is a simple immersive 3D Scene built in OpenGL that explores a human and an alien peacefully flying in the middle of the ocean, above the clouds
 
