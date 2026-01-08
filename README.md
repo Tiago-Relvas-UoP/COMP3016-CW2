@@ -5,7 +5,7 @@
 
 ## Instructions
 
-Important: This project uses [Visual Studio Community 2022](https://github.com/Tiago-Relvas-UoP/COMP3016-CW2/tree/main/vs22-setup). An installer can be found in this repository (linked within this paragraph) as a precaution, considering the official microsoft website no longer has a download for this version of VS.
+Important: This project uses Visual Studio Community 2022 with "Desktop development with C++" Workload installed. A .exe installer can be found in this [repository](https://github.com/Tiago-Relvas-UoP/COMP3016-CW2/tree/main/vs22-setup) as a precaution, considering the official microsoft website no longer has a download for this version of VS.
 
 ### Installing Assimp
 - All dependencies are already included in the source code apart from Assimp, due to its size.
