@@ -14,17 +14,17 @@ Important: This project uses Visual Studio Community 2022 with "Desktop developm
 - Install [Cmake](https://cmake.org/download/). After installing, open it and at the top select `C:\Users\Public\Assimp\Source\assimp` as the location of the Source Code, and `C:\Users\Public\Assimp\Binaries` as the place to build the binaries.
 - Afterwards, navigate to the bottom of the program and open the "Configure" menu. Select "Visual Studio 17 2022" as the generator and then click "Finish"
 - Once the configuration is done, click on "Generate".
-- After the generation is done, go to File Explorer and navigate to `C:\Users\Public\Assimp\Binaries`. Open the `Assimp.sln` file.
+- After the generation is done, go to File Explorer and navigate to `C:\Users\Public\Assimp\Binaries`. Open the `Assimp.sln` file with VS2022.
 - Once inside, at the top on the left of "x64", change from Debug to Release and then hit "Local Windows Debugger".
 - This will generate all important libraries. Wait until it finishes building the solution, or until an error related to "\ALL_BUILD" Access is denied" appears.
 - Assimp is now successfuly installed.
 
 ### Compiling the program (After installing Assimp)
-- Download source code
-- Extract it anywhere
-- Open project file (`OpenGL-CW2.sln`)
+- Download source code.
+- Extract it anywhere.
+- Open project file (`OpenGL-CW2.sln`) with with VS2022.
 - At the top, select either Debug/Release and 64x/86x (Depending if your system is 64/32 bits).
-- Next to those options, select "Local Windows Debugger"
+- Next to those options, select "Local Windows Debugger".
 - Enjoy!
 
 ## Project Description
