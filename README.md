@@ -10,7 +10,7 @@ Important: This project uses Visual Studio Community 2022 with "Desktop developm
 ### Installing Assimp
 - All dependencies are already included in the source code apart from Assimp, due to its size.
 - To install Assimp, create a folder name `Assimp` in `C:\Users\Public`, and two folders inside it named `Source` and `Binaries`
-- Inside the `Source` file, open a Terminal and type the following command: `git clone https://github.com/assimp/assimp.git` 
+- Inside the `Source` folder, open a Terminal and type the following command: `git clone https://github.com/assimp/assimp.git` 
 - Install [Cmake](https://cmake.org/download/). After installing, open it and at the top select `C:\Users\Public\Assimp\Source\assimp` as the location of the Source Code, and `C:\Users\Public\Assimp\Binaries` as the place to build the binaries.
 - Afterwards, navigate to the bottom of the program and open the "Configure" menu. Select "Visual Studio Community 2022" as the generator and then click "Finish"
 - Once the configuration is done, click on "Generate".
