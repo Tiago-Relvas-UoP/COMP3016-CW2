@@ -3,13 +3,26 @@
 ## Youtube video
 [Link](https://youtu.be/N0AhzRSZ5Kw)
 
-## How-to-compile source code
-- Install Visual Studio Community 2022, and select all C++ plugins for compatibility during install
+## Instructions
+
+Important: This project uses Visual Studio Community 2022.
+
+### Installing Assimp
+- All dependencies are already included in the source code apart from Assimp, due to its size.
+- To install Assimp, create a folder name `Assimp` in `C:\Users\Public`, and two folders inside it named `Source` and `Binaries`
+- Inside the `Source` file, open a Terminal and type the following command: `git clone https://github.com/assimp/assimp.git` 
+- Install [Cmake](https://cmake.org/download/). After installing, open it and at the top select `C:\Users\Public\Assimp\Source\assimp` as the location of the Source Code, and `C:\Users\Public\Assimp\Binaries` as the place to build the binaries.
+- Afterwards, navigate to the bottom of the program and open the "Configure" menu. Select "Visual Studio Community 2022" as the generator and then click "Finish"
+- Once the configuration is done, click on "Generate".
+- After the generation is done, go to File Explorer and navigate to `C:\Users\Public\Assimp\Binaries`. Open the `Assimp.sln` file.
+- Once inside, at the top on the left of "x64", change from Debug to Release and then hit "Local Windows Debugger".
+- This will generate all important libraries. Wait until it finishes building the solution, or until an error related to "\ALL_BUILD" Access is denied" appears.
+- Assimp is now successfuly installed.
+
+### Compiling the program (After installing Assimp)
 - Download source code
 - Extract it anywhere
-- Before opening the project file, all dependencies need to be in place. Everything is already placed in the `\dependencies` except Assimp due to its size
-- To download Assimp, navigate to their [Github Page](https://github.com/assimp/assimp/blob/master/Build.md) and follow the Build Instructions. Ensure that ASSIMP Folder is cloned into the following directory: `C:\Users\Public` (So the root of Assimp is: `C:\Users\Public\Assimp`)
-- After successfully downloading Assimp, open the project file. (`OpenGL-CW2.sln`)
+- Open project file (`OpenGL-CW2.sln`)
 - At the top, select either Debug/Release and 64x/86x (Depending if your system is 64/32 bits).
 - Next to those options, select "Local Windows Debugger"
 - Enjoy!
