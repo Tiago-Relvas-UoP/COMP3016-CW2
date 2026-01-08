@@ -16,7 +16,7 @@ Important: This project uses Visual Studio Community 2022 with "Desktop developm
 - Once the configuration is done, click on "Generate".
 - After the generation is done, go to File Explorer and navigate to `C:\Users\Public\Assimp\Binaries`. Open the `Assimp.sln` file with VS2022.
 - Once inside, at the top on the left of "x64", change from Debug to Release and then hit "Local Windows Debugger".
-- This will generate all important libraries. Wait until it finishes building the solution, or until an error related to "\ALL_BUILD" Access is denied" appears.
+- This will generate all important libraries. Wait until it finishes building the solution, or until an error related to "\ALL_BUILD" Access is denied" appears (Click "Ok" if its the case).
 - Assimp is now successfuly installed.
 
 ### Compiling the program (After installing Assimp)
